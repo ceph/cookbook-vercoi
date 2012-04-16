@@ -1,0 +1,119 @@
+#!/usr/bin/python
+
+# nameif is not useful when virtual interfaces are inheriting the mac
+# from the physical interface; e.g. after a "ip link add link ... name
+# ... type vlan id ...", it will try to rename the vlan interface,
+# collides with the physical interface, and aborts
+
+# GOAL="$1"; shift
+# MAC="$1"; shift
+
+# if ip -o link show dev "$GOAL" >/dev/null 2>/dev/null; then
+#     echo "$0: already there." 1>&2
+#     exit 0
+# fi
+
+# FOUND="$(ip -o link show | sed -n "s,^[0-9]\+: \(eth[0-9]\+\): .* link/ether ${MAC} .*,\1,p q")"
+
+# if [ -n "$FOUND" ]; then
+# fi
+
+
+# | while read line; do
+    
+# done
+
+import argparse
+import os
+import re
+import subprocess
+import sys
+
+PROG = os.path.basename(sys.argv[0])
+
+class Fail(SystemExit):
+    def __init__(self, msg, **kwargs):
+        msg = msg.format(**kwargs)
+        super(Fail, self).__init__('{prog}: {msg}'.format(
+                prog=PROG,
+                msg=msg,
+                ))
+
+LINK_RE = re.compile(r"""
+# ifindex
+^\d+:[ ]
+# iface name
+(?P<iface>.*?):[ ]
+# uninteresting
+.*[ ]
+# mac address
+link/ether\ (?P<mac>[0-9a-f][0-9a-f](?::[0-9a-f][0-9a-f]){5})
+# tailing uninterestingness
+[ ]
+""", re.MULTILINE|re.VERBOSE)
+
+def get_state():
+    output = subprocess.check_output(['ip', '-o', 'link', 'show'])
+    matches = LINK_RE.findall(output)
+    links = dict(matches)
+    return links
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description='Rename interface based on MAC address',
+        )
+    parser.add_argument(
+        'iface',
+        help='Desired interface name',
+        )
+    parser.add_argument(
+        'mac',
+        help='MAC address to look for',
+        )
+    args = parser.parse_args()
+
+    state = get_state()
+
+    cur = state.get(args.iface)
+    if cur is not None:
+        if cur != args.mac:
+            raise Fail(
+                'Interface exists with wrong MAC: {iface} {mac}',
+                iface=args.iface,
+                mac=cur,
+                )
+
+        # all done here
+        return
+
+    # no interface by that name exists currently; look for it
+    candidates = [iface
+                 for (iface,mac) in state.iteritems()
+                 if mac == args.mac]
+    if not candidates:
+        raise Fail(
+            'Cannot find any interface with MAC: {mac}',
+            mac=args.mac,
+            )
+
+    if len(candidates) > 1:
+        only_eth = [iface
+                    for iface in candidates
+                    if iface.startswith('eth')]
+        if only_eth:
+            candidates = only_eth
+
+    if len(candidates) > 1:
+        raise Fail(
+            'Several candidate interfaces, aborting: {ifaces}',
+            ifaces=' '.join(candidates),
+            )
+
+    # and finally do it
+    iface = candidates[0]
+    os.execvp('ip', ['ip', 'link' 'set', iface, 'name', args.iface])
+
+if __name__ == '__main__':
+    import sys
+    sys.exit(main())

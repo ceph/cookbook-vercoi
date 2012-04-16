@@ -1,0 +1,40 @@
+#!/bin/sh
+
+# This file is not chmod a+x on purpose, to avoid running it
+# accidentally. Automation will always run it through
+#
+# wget -q -O- https://raw.github.com/ceph/cookbook-vercoi/master/solo/solo-from-scratch | sh
+
+set -e
+
+for package in git; do
+    if [ "$(dpkg --status -- $package|sed -n 's/^Status: //p')" != "install ok installed" ]; then
+        # add a space after old values
+        missing="${missing:+$missing }$package"
+    fi
+done
+if [ -n "$missing" ]; then
+    echo "solo-from-scratch: installing missing required packages: $missing" 1>&2
+    sudo \
+	env DEBIAN_FRONTEND=noninteractive DEBIAN_PRIORITY=critical \
+	apt-get \
+	-q \
+        -o Dpkg::Options::=--force-confnew \
+        install \
+        --no-install-recommends \
+        --assume-yes \
+	-- \
+	$missing
+fi
+
+SCRATCH="$(mktemp -d --tmpdir 'solo-from-scratch.XXXXXXXXXXXX')"
+cd "$SCRATCH"
+
+cleanup () {
+    rm -rf "$SCRATCH"
+}
+
+trap cleanup INT TERM EXIT
+git init
+git pull https://github.com/ceph/cookbook-vercoi.git
+./solo/run

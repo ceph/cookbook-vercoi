@@ -1,0 +1,48 @@
+# AUTO-GENERATED with Chef, DO NOT EDIT
+
+# The loopback network interface
+auto lo
+iface lo inet loopback
+
+
+auto 1g1
+iface 1g1 inet manual
+  pre-up /etc/network/rename-if-by-mac -- "$IFACE" <%= @macs['1g1'] %>
+
+auto br-front
+iface br-front inet static
+  bridge_ports 1g1
+  bridge_fd 9
+  bridge_hello 2
+  bridge_maxage 12
+  bridge_stp off
+  # "front" is special: instead of just the vlan trunk, it has a
+  # native vlan for PXE; this IP address is useful for SSH
+  address <%= @ips['front'] %>
+  netmask 255.255.240.0
+  gateway 10.214.128.1
+
+
+# "back" side: trunk with no native vlan
+auto 10g2
+iface 10g2 inet manual
+  pre-up /etc/network/rename-if-by-mac -- "$IFACE" <%= @macs['10g2'] %>
+  # ixgbe README warns against bridging/routing and LRO/GRO
+  # http://downloadmirror.intel.com/14687/eng/README.txt
+  pre-up ethtool -K "$IFACE" gro off lro off
+
+auto vlan-back
+iface vlan-back inet manual
+  pre-up ip link add link 10g2 name "$IFACE" type vlan id 2214
+  pre-up ip link set dev "$IFACE" up
+  pre-down ip link delete "$IFACE"
+
+auto br-back
+iface br-back inet static
+  bridge_ports vlan-back
+  bridge_fd 9
+  bridge_hello 2
+  bridge_maxage 12
+  bridge_stp off
+  address <%= @ips['back'] %>
+  netmask 255.255.240.0
