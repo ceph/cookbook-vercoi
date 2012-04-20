@@ -46,3 +46,21 @@ iface br-back inet static
   bridge_stp off
   address <%= @ips['back'] %>
   netmask 255.255.240.0
+
+# "ipmi": trunked on same 10G interface as "back"
+auto vlan-ipmi
+iface vlan-ipmi inet manual
+  pre-up ip link add link 10g2 name "$IFACE" type vlan id 414
+  pre-up ip link set dev "$IFACE" up
+  pre-down ip link delete "$IFACE"
+
+auto br-ipmi
+iface br-ipmi inet static
+  bridge_ports vlan-ipmi
+  bridge_fd 9
+  bridge_hello 2
+  bridge_maxage 12
+  bridge_stp off
+  address <%= @ips['ipmi'] %>
+  netmask 255.255.240.0
+
