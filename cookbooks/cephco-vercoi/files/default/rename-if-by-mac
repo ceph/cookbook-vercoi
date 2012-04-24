@@ -112,7 +112,7 @@ def main():
 
     # and finally do it
     iface = candidates[0]
-    os.execvp('ip', ['ip', 'link' 'set', iface, 'name', args.iface])
+    os.execvp('ip', ['ip', 'link', 'set', iface, 'name', args.iface])
 
 if __name__ == '__main__':
     import sys
