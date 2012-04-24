@@ -65,8 +65,8 @@ VERCOI_IPS = {
 
 cookbook_file '/etc/network/rename-if-by-mac' do
   backup false
-  owner root
-  group root
+  owner 'root'
+  group 'root'
   mode 0755
 end
 
