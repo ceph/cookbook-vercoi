@@ -47,7 +47,8 @@ iface br-back inet static
   address <%= @ips['back'] %>
   netmask 255.255.240.0
 
-# "ipmi": trunked on same 10G interface as "back"
+# "ipmi": trunked on same 10G interface as "back".  No IP setup;
+# VMs will attach to the bridge and set up IP for themselves
 auto vlan-ipmi
 iface vlan-ipmi inet manual
   pre-up ip link add link 10g2 name "$IFACE" type vlan id 414
@@ -61,6 +62,3 @@ iface br-ipmi inet static
   bridge_hello 2
   bridge_maxage 12
   bridge_stp off
-  address <%= @ips['ipmi'] %>
-  netmask 255.255.240.0
-
