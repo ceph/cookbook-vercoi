@@ -8,6 +8,7 @@ iface lo inet loopback
 auto 1g1
 iface 1g1 inet manual
   pre-up /etc/network/rename-if-by-mac -- "$IFACE" <%= @macs['1g1'] %>
+  pre-up ip link set dev "$IFACE" up
 
 auto br-front
 iface br-front inet static
@@ -30,6 +31,7 @@ iface 10g2 inet manual
   # ixgbe README warns against bridging/routing and LRO/GRO
   # http://downloadmirror.intel.com/14687/eng/README.txt
   pre-up ethtool -K "$IFACE" gro off lro off
+  pre-up ip link set dev "$IFACE" up
 
 auto vlan-back
 iface vlan-back inet manual
