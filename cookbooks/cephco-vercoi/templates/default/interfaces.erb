@@ -64,3 +64,19 @@ iface br-ipmi inet static
   bridge_hello 2
   bridge_maxage 12
   bridge_stp off
+
+# "pub": trunked on same 10G interface as "back".  No IP setup;
+# VMs will attach to the bridge and set up IP for themselves
+auto vlan-pub
+iface vlan-pub inet manual
+  pre-up ip link add link 10g2 name "$IFACE" type vlan id 146
+  pre-up ip link set dev "$IFACE" up
+  pre-down ip link delete "$IFACE"
+
+auto br-pub
+iface br-pub inet static
+  bridge_ports vlan-pub
+  bridge_fd 9
+  bridge_hello 2
+  bridge_maxage 12
+  bridge_stp off
