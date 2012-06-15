@@ -1,0 +1,6 @@
+<network>
+  <name>pub</name>
+  <!-- needs ubuntu 12.04 for libvirt >=0.9.4 -->
+  <bridge name='br-pub'/>
+  <forward mode='bridge'/>
+</network>

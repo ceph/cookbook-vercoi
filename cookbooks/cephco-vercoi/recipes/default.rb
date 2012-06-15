@@ -7,3 +7,4 @@ package 'python-vm-builder'
 include_recipe "cephco-vercoi::ssh-keys"
 include_recipe "cephco-vercoi::serial"
 include_recipe "cephco-vercoi::networking"
+include_recipe "cephco-vercoi::libvirt"
