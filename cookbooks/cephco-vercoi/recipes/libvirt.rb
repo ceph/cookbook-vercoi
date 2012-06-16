@@ -13,9 +13,20 @@ end
 execute 'set up libvirt network pub' do
   command <<-'EOH'
     set -e
-    virsh net-define /srv/chef/libvirt-net-pub.xml
-    virsh net-autostart pub
-    virsh net-start pub
+    if [ ! virsh net-uuid pub >/dev/null 2>/dev/null ]; then
+      # does not exist
+      virsh net-define /srv/chef/libvirt-net-pub.xml
+    fi
+    virsh -q net-info pub | while read line; do
+      case "$line" in
+        Active:\ *no)
+          virsh net-start pub
+          ;;
+        Autostart:\ *no)
+          virsh net-autostart pub
+          ;;
+      esac
+    done
   EOH
 end
 
