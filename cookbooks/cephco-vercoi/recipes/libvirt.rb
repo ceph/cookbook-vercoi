@@ -30,6 +30,32 @@ execute 'set up libvirt network pub' do
   EOH
 end
 
+cookbook_file '/srv/chef/libvirt-net-front.xml' do
+  owner 'root'
+  group 'root'
+  mode 0644
+end
+
+execute 'set up libvirt network front' do
+  command <<-'EOH'
+    set -e
+    if ! virsh net-uuid front >/dev/null 2>/dev/null; then
+      # does not exist
+      virsh net-define /srv/chef/libvirt-net-front.xml
+    fi
+    virsh -q net-info front | while read line; do
+      case "$line" in
+        Active:\ *no)
+          virsh net-start front
+          ;;
+        Autostart:\ *no)
+          virsh net-autostart front
+          ;;
+      esac
+    done
+  EOH
+end
+
 execute 'allow libvirt for user ubuntu' do
   command <<-'EOH'
     set -e
