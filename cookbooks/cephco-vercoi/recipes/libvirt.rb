@@ -13,7 +13,7 @@ end
 execute 'set up libvirt network pub' do
   command <<-'EOH'
     set -e
-    if [ ! virsh net-uuid pub >/dev/null 2>/dev/null ]; then
+    if ! virsh net-uuid pub >/dev/null 2>/dev/null; then
       # does not exist
       virsh net-define /srv/chef/libvirt-net-pub.xml
     fi
