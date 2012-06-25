@@ -87,3 +87,165 @@ iface br-pub inet manual
   bridge_stp off
   up ip link set dev "$IFACE" up
   pre-down ip link set dev "$IFACE" down
+
+# "isolatedN": trunked on same 10G interface as "back".  No IP setup;
+# VMs will attach to the bridge and set up IP for themselves
+auto vlan-isolated0
+iface vlan-isolated0 inet manual
+  pre-up ip link add link 10g2 name "$IFACE" type vlan id 1000
+  pre-up ip link set dev "$IFACE" up
+  pre-down ip link delete "$IFACE"
+
+auto br-isolated0
+iface br-isolated0 inet manual
+  bridge_ports vlan-isolated0
+  bridge_fd 9
+  bridge_hello 2
+  bridge_maxage 12
+  bridge_stp off
+  up ip link set dev "$IFACE" up
+  pre-down ip link set dev "$IFACE" down
+
+auto vlan-isolated1
+iface vlan-isolated1 inet manual
+  pre-up ip link add link 10g2 name "$IFACE" type vlan id 1001
+  pre-up ip link set dev "$IFACE" up
+  pre-down ip link delete "$IFACE"
+
+auto br-isolated1
+iface br-isolated1 inet manual
+  bridge_ports vlan-isolated1
+  bridge_fd 9
+  bridge_hello 2
+  bridge_maxage 12
+  bridge_stp off
+  up ip link set dev "$IFACE" up
+  pre-down ip link set dev "$IFACE" down
+
+auto vlan-isolated2
+iface vlan-isolated2 inet manual
+  pre-up ip link add link 10g2 name "$IFACE" type vlan id 1002
+  pre-up ip link set dev "$IFACE" up
+  pre-down ip link delete "$IFACE"
+
+auto br-isolated2
+iface br-isolated2 inet manual
+  bridge_ports vlan-isolated2
+  bridge_fd 9
+  bridge_hello 2
+  bridge_maxage 12
+  bridge_stp off
+  up ip link set dev "$IFACE" up
+  pre-down ip link set dev "$IFACE" down
+
+auto vlan-isolated3
+iface vlan-isolated3 inet manual
+  pre-up ip link add link 10g2 name "$IFACE" type vlan id 1003
+  pre-up ip link set dev "$IFACE" up
+  pre-down ip link delete "$IFACE"
+
+auto br-isolated3
+iface br-isolated3 inet manual
+  bridge_ports vlan-isolated3
+  bridge_fd 9
+  bridge_hello 2
+  bridge_maxage 12
+  bridge_stp off
+  up ip link set dev "$IFACE" up
+  pre-down ip link set dev "$IFACE" down
+
+auto vlan-isolated4
+iface vlan-isolated4 inet manual
+  pre-up ip link add link 10g2 name "$IFACE" type vlan id 1004
+  pre-up ip link set dev "$IFACE" up
+  pre-down ip link delete "$IFACE"
+
+auto br-isolated4
+iface br-isolated4 inet manual
+  bridge_ports vlan-isolated4
+  bridge_fd 9
+  bridge_hello 2
+  bridge_maxage 12
+  bridge_stp off
+  up ip link set dev "$IFACE" up
+  pre-down ip link set dev "$IFACE" down
+
+auto vlan-isolated5
+iface vlan-isolated5 inet manual
+  pre-up ip link add link 10g2 name "$IFACE" type vlan id 1005
+  pre-up ip link set dev "$IFACE" up
+  pre-down ip link delete "$IFACE"
+
+auto br-isolated5
+iface br-isolated5 inet manual
+  bridge_ports vlan-isolated5
+  bridge_fd 9
+  bridge_hello 2
+  bridge_maxage 12
+  bridge_stp off
+  up ip link set dev "$IFACE" up
+  pre-down ip link set dev "$IFACE" down
+
+auto vlan-isolated6
+iface vlan-isolated6 inet manual
+  pre-up ip link add link 10g2 name "$IFACE" type vlan id 1006
+  pre-up ip link set dev "$IFACE" up
+  pre-down ip link delete "$IFACE"
+
+auto br-isolated6
+iface br-isolated6 inet manual
+  bridge_ports vlan-isolated6
+  bridge_fd 9
+  bridge_hello 2
+  bridge_maxage 12
+  bridge_stp off
+  up ip link set dev "$IFACE" up
+  pre-down ip link set dev "$IFACE" down
+
+auto vlan-isolated7
+iface vlan-isolated7 inet manual
+  pre-up ip link add link 10g2 name "$IFACE" type vlan id 1007
+  pre-up ip link set dev "$IFACE" up
+  pre-down ip link delete "$IFACE"
+
+auto br-isolated7
+iface br-isolated7 inet manual
+  bridge_ports vlan-isolated7
+  bridge_fd 9
+  bridge_hello 2
+  bridge_maxage 12
+  bridge_stp off
+  up ip link set dev "$IFACE" up
+  pre-down ip link set dev "$IFACE" down
+
+auto vlan-isolated8
+iface vlan-isolated8 inet manual
+  pre-up ip link add link 10g2 name "$IFACE" type vlan id 1008
+  pre-up ip link set dev "$IFACE" up
+  pre-down ip link delete "$IFACE"
+
+auto br-isolated8
+iface br-isolated8 inet manual
+  bridge_ports vlan-isolated8
+  bridge_fd 9
+  bridge_hello 2
+  bridge_maxage 12
+  bridge_stp off
+  up ip link set dev "$IFACE" up
+  pre-down ip link set dev "$IFACE" down
+
+auto vlan-isolated9
+iface vlan-isolated9 inet manual
+  pre-up ip link add link 10g2 name "$IFACE" type vlan id 1009
+  pre-up ip link set dev "$IFACE" up
+  pre-down ip link delete "$IFACE"
+
+auto br-isolated9
+iface br-isolated9 inet manual
+  bridge_ports vlan-isolated9
+  bridge_fd 9
+  bridge_hello 2
+  bridge_maxage 12
+  bridge_stp off
+  up ip link set dev "$IFACE" up
+  pre-down ip link set dev "$IFACE" down
