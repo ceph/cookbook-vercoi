@@ -62,3 +62,42 @@ execute 'allow libvirt for user ubuntu' do
     gpasswd -a ubuntu libvirtd
   EOH
 end
+
+
+# TODO refactor into a libvirt_interface LWR?
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].each do |num|
+
+  template "/srv/chef/libvirt-net-isolated#{num}.xml" do
+    source 'libvirt-net-isolated.xml.erb'
+    owner 'root'
+    group 'root'
+    mode 0644
+    variables(
+              'name' => "isolated#{num}",
+              )
+  end
+
+  execute "set up libvirt network isolated#{num}" do
+    environment ({
+                   'NET' => "isolated#{num}",
+                 })
+    command <<-'EOH'
+      set -e
+      if ! virsh net-uuid "$NET" >/dev/null 2>/dev/null; then
+        # does not exist
+        virsh net-define /srv/chef/libvirt-net-"$NET".xml
+      fi
+      virsh -q net-info "$NET" | while read line; do
+        case "$line" in
+          Active:\ *no)
+            virsh net-start "$NET"
+            ;;
+          Autostart:\ *no)
+            virsh net-autostart "$NET"
+            ;;
+        esac
+      done
+    EOH
+  end
+
+end
