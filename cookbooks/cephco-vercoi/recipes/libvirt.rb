@@ -1,3 +1,24 @@
+# workaround for bug https://bugs.launchpad.net/ubuntu/+source/libvirt/+bug/1018956
+execute 'set up libvirt pool default' do
+  command <<-'EOH'
+    set -e
+    if ! virsh pool-uuid default >/dev/null 2>/dev/null; then
+      # does not exist
+      virsh pool-define-as --name default dir --target /var/lib/libvirt/images
+    fi
+    virsh -q pool-info default | while read line; do
+      case "$line" in
+        State:\ *inactive)
+          virsh pool-start default
+          ;;
+        Autostart:\ *no)
+          virsh pool-autostart default
+          ;;
+      esac
+    done
+  EOH
+end
+
 directory '/srv/chef' do
   owner 'root'
   group 'root'
